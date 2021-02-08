@@ -1,21 +1,25 @@
 import graphql from 'babel-plugin-relay/macro';
 import React from 'react';
 import { usePaginationFragment } from 'react-relay/hooks';
+import { ReaderFragment } from 'relay-runtime';
 import IssuesListItem from './IssuesListItem';
+import { HomeRootIssuesQueryResponse } from './__generated__/HomeRootIssuesQuery.graphql';
+import { IssuesPaginationQuery } from './__generated__/IssuesPaginationQuery.graphql';
+import { Issues_repository, Issues_repository$key } from './__generated__/Issues_repository.graphql';
 
 const { useCallback } = React;
 
 /**
  * Renders a list of issues for a given repository.
  */
-export default function Issues(props) {
+export default function Issues(props: HomeRootIssuesQueryResponse) {
   // Given a reference to a repository in props.repository, defines *what*
   // data the component needs about that repository. In this case we fetch
   // the list of issues starting at a given cursor (initially null to start
   // at the beginning of the issues list). See the usePaginationFragment()
   // docs: https://relay.dev/docs/en/experimental/api-reference#usepaginationfragment
   // for more details about how to use this hook to paginate over lists.
-  const { data, loadNext, isLoadingNext } = usePaginationFragment(
+  const { data, loadNext, isLoadingNext } = usePaginationFragment<IssuesPaginationQuery, Issues_repository$key>(
     graphql`
       fragment Issues_repository on Repository
         @argumentDefinitions(
@@ -51,7 +55,7 @@ export default function Issues(props) {
 
   return (
     <div className="issues">
-      {data.issues.edges.map(edge => {
+      {data?.issues?.edges?.map(edge => {
         if (edge == null || edge.node == null) {
           return null;
         }
